@@ -2,7 +2,6 @@ package dev.littlexfish.service
 
 import dev.littlexfish.dto.DirectoryStruct
 import dev.littlexfish.dto.Node
-import io.ktor.util.*
 import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -21,21 +20,34 @@ object FileService {
 	// Should be disabled, but admin can enable it
 	private var traversalEnabled = false
 
-	fun listFiles(path: String): List<File> {
-		val resolve = rootFile.resolve(path)
-		if(!resolve.exists()) {
-			throw FileStateErrorException(FileStateErrorException.FileStateError.NOT_EXIST, resolve)
+	fun listFiles(parent: File): List<File> {
+		if(!parent.exists()) {
+			throw FileStateErrorException(FileStateErrorException.FileStateError.NOT_EXIST, parent)
 		}
-		if(resolve.isFile) {
-			throw FileStateErrorException(FileStateErrorException.FileStateError.NOT_DIRECTORY, resolve)
+		if(parent.isFile) {
+			throw FileStateErrorException(FileStateErrorException.FileStateError.NOT_DIRECTORY, parent)
 		}
-		if(!resolve.canRead()) {
-			throw FileStateErrorException(FileStateErrorException.FileStateError.NOT_READABLE, resolve)
+		if(!parent.canRead()) {
+			throw FileStateErrorException(FileStateErrorException.FileStateError.NOT_READABLE, parent)
 		}
-		if(!traversalEnabled && resolve.path.split(File.pathSeparator).contains("..")) {
+		val relative = fileToRelative(parent)
+		if(!traversalEnabled && relative.split(File.pathSeparator).contains("..")) {
 			throw IllegalStateException("Traversal is disabled")
 		}
-		return resolve.listFiles()?.toList() ?: emptyList()
+		val list = parent.listFiles()?.toList() ?: emptyList()
+		return list.filter {
+			isPathValid(it.path)
+		}
+	}
+
+	private fun fileToRelative(file: File): String {
+		return file.toRelativeString(rootFile)
+	}
+
+	private fun isPathValid(path: String): Boolean {
+		val resolve = rootFile.resolve(path)
+		val block = ConfigService.config.blacklistPath.contains(resolve.path)
+		return !(if (ConfigService.config.listReverse) !block else block)
 	}
 
 	fun getFile(path: String): File {
@@ -50,7 +62,7 @@ object FileService {
 	}
 
 	fun getPath(file: File): String {
-		return rootFile.resolve(file).normalizeAndRelativize().path
+		return fileToRelative(file).replace('\\', '/')
 	}
 
 	fun getFileAsZip(file: File): DirectoryStruct {

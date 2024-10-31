@@ -17,7 +17,7 @@ data class FileStruct(
 fun File.listToDirectoryFiles(): DirectoryFiles {
 	return DirectoryFiles(
 		path = FileService.getPath(this),
-		files = listFiles()?.map(File::toFileStruct)?.sort() ?: emptyList()
+		files = FileService.listFiles(this).map(File::toFileStruct).sort()
 	)
 }
 
