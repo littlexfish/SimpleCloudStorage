@@ -8,10 +8,6 @@ import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Route.routeDirectoryView() {
-
-}
-
 private val pathNotDirectoryError = Error(HttpStatusCode.BadRequest, "Path is not a directory")
 
 fun Route.apiDirectoryView() {

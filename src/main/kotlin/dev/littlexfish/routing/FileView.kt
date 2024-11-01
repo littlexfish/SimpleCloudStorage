@@ -2,6 +2,7 @@ package dev.littlexfish.routing
 
 import dev.littlexfish.dto.Error
 import dev.littlexfish.dto.respondError
+import dev.littlexfish.service.ConfigService
 import dev.littlexfish.service.FileService
 import io.ktor.http.*
 import io.ktor.server.response.*
@@ -21,11 +22,24 @@ fun Route.apiFileView() {
 				call.respondError(pathNotFileError)
 			}
 		}
+		get("/type") {
+			val path = call.request.queryParameters["path"] ?: "."
+			val file = FileService.getFile(path)
+			if (file.isFile) {
+				call.respond(mapOf(
+					"type" to FileService.getExtensionType(file.extension),
+					"viewable" to ConfigService.config.allowedViewExtensions.contains(file.extension)
+				))
+			}
+			else {
+				call.respondError(pathNotFileError)
+			}
+		}
 		get("/text") {
 			val path = call.request.queryParameters["path"] ?: "."
 			val file = FileService.getFile(path)
 			if (file.isFile) {
-				call.respondText(file.readText())
+				call.respond(FileService.getFilePreview(file))
 			}
 			else {
 				call.respondError(pathNotFileError)

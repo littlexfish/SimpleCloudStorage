@@ -1,8 +1,10 @@
 package dev.littlexfish.service
 
 import dev.littlexfish.dto.DirectoryStruct
+import dev.littlexfish.dto.FilePreview
 import dev.littlexfish.dto.Node
 import java.io.File
+import java.nio.CharBuffer
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -17,6 +19,22 @@ object FileService {
 			mkdirs()
 		}
 	}
+	private val extensionTypeMap = mapOf(
+		"jpg" to ViewExtensionType.IMAGE,
+		"jpeg" to ViewExtensionType.IMAGE,
+		"png" to ViewExtensionType.IMAGE,
+		"gif" to ViewExtensionType.IMAGE,
+		"bmp" to ViewExtensionType.IMAGE,
+		"webp" to ViewExtensionType.IMAGE,
+
+		"txt" to ViewExtensionType.TEXT,
+		"log" to ViewExtensionType.TEXT,
+
+		"pdf" to ViewExtensionType.PDF,
+
+		"zip" to ViewExtensionType.ZIP,
+		"jar" to ViewExtensionType.ZIP,
+	)
 	// Should be disabled, but admin can enable it
 	private var traversalEnabled = false
 
@@ -65,6 +83,16 @@ object FileService {
 		return fileToRelative(file).replace('\\', '/')
 	}
 
+	fun getFilePreview(file: File): FilePreview {
+		val buffer = CharBuffer.allocate(ConfigService.config.maxTextFilePreviewLength)
+		file.bufferedReader().use {
+			it.read(buffer)
+		}
+		val hasTruncate = !buffer.hasRemaining()
+		buffer.flip()
+		return FilePreview(buffer.toString(), file.length(), hasTruncate)
+	}
+
 	fun getFileAsZip(file: File): DirectoryStruct {
 		fun splitPath(path: String): List<String> {
 			return path.split("/")
@@ -94,6 +122,10 @@ object FileService {
 		zip.entries().asIterator().forEach { putEntry(it, nodes) }
 		zip.close()
 		return DirectoryStruct(file.path, nodes)
+	}
+
+	fun getExtensionType(extension: String): ViewExtensionType {
+		return extensionTypeMap[extension] ?: ViewExtensionType.UNKNOWN
 	}
 
 	fun getSCSFile(name: String): File {

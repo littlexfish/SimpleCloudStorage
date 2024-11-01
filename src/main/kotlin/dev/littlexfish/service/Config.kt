@@ -47,25 +47,21 @@ class Config {
 	/**
 	 * Allowed view extensions
 	 */
-	var allowedViewExtensions: Map<String, ViewExtensionType> = mapOf(
-		"jpg" to ViewExtensionType.IMAGE,
-		"jpeg" to ViewExtensionType.IMAGE,
-		"png" to ViewExtensionType.IMAGE,
-		"gif" to ViewExtensionType.IMAGE,
-		"bmp" to ViewExtensionType.IMAGE,
-		"webp" to ViewExtensionType.IMAGE,
-
-		"txt" to ViewExtensionType.TEXT,
-		"log" to ViewExtensionType.TEXT,
-
-		"pdf" to ViewExtensionType.PDF,
-
-		"zip" to ViewExtensionType.ZIP,
+	var allowedViewExtensions: Set<String> = setOf(
+		"jpg", "jpeg", "png", "gif", "bmp", "webp",
+		"txt", "log",
+		"pdf",
+		"zip"
 	)
+
+	/**
+	 * Max text file preview length, default 1MB
+	 */
+	var maxTextFilePreviewLength = 1024 * 1024
 
 }
 
 
 enum class ViewExtensionType {
-	IMAGE, TEXT, PDF, ZIP
+	IMAGE, TEXT, PDF, ZIP, UNKNOWN
 }
