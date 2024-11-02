@@ -10,6 +10,8 @@ import java.util.zip.ZipFile
 
 object FileService {
 
+	private val pathSepRegex = Regex("[/\\\\]+")
+
 	private val scsHome = System.getProperty("SCS_HOME")?.let { File(it) } ?: File(System.getenv("user.dir"), ProgramService.NAME)
 	private val rootFile = File(System.getProperty("SCS_ROOT") ?: System.getenv("SCS_ROOT") ?: ".").apply {
 		if(isFile) {
@@ -49,8 +51,8 @@ object FileService {
 			throw FileStateErrorException(FileStateErrorException.FileStateError.NOT_READABLE, parent)
 		}
 		val relative = fileToRelative(parent)
-		if(!traversalEnabled && relative.split(File.pathSeparator).contains("..")) {
-			throw IllegalStateException("Traversal is disabled")
+		if(!traversalEnabled && relative.split(pathSepRegex).contains("..")) {
+			throw FileStateErrorException(FileStateErrorException.FileStateError.TRAVERSAL_DISABLED, parent)
 		}
 		val list = parent.listFiles()?.toList() ?: emptyList()
 		return list.filter {
@@ -59,7 +61,7 @@ object FileService {
 	}
 
 	private fun fileToRelative(file: File): String {
-		return file.toRelativeString(rootFile)
+		return file.toRelativeString(rootFile).replace('\\', '/') // force use / as separator
 	}
 
 	private fun isPathValid(path: String): Boolean {
@@ -69,7 +71,7 @@ object FileService {
 	}
 
 	fun getFile(path: String): File {
-		val resolve = rootFile.resolve(path)
+		val resolve = rootFile.resolve(path.removePrefix("/"))
 		if(!resolve.exists()) {
 			throw FileStateErrorException(FileStateErrorException.FileStateError.NOT_EXIST, resolve)
 		}
@@ -132,7 +134,7 @@ object FileService {
 		return File(scsHome, name)
 	}
 
-	class FileStateErrorException(state: FileStateError, file: File) : RuntimeException("${state.message}: $file") {
+	class FileStateErrorException(state: FileStateError, file: File) : RuntimeException("${state.message}: ${fileToRelative(file)}") {
 
 		enum class FileStateError(val message: String) {
 			NOT_EXIST("File does not exist"),
@@ -140,6 +142,7 @@ object FileService {
 			NOT_DIRECTORY("Path is not a directory"),
 			NOT_READABLE("Path is not readable"),
 			NOT_WRITABLE("Path is not writable"),
+			TRAVERSAL_DISABLED("Traversal is disabled"),
 		}
 
 	}

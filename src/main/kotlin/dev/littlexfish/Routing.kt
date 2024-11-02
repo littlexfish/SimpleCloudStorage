@@ -16,8 +16,15 @@ private val webStatic = (System.getProperty("SCS_WEB_STATIC")?.let { File(it) } 
 fun Application.configureStatusPage() {
 	install(StatusPages) {
 		exception<Throwable> { call, cause ->
-			cause.printStackTrace()
-			call.respondError(Error(HttpStatusCode.InternalServerError, cause.message ?: "Internal Server Error"))
+			when (cause) {
+				is FileService.FileStateErrorException -> {
+					call.respondError(Error(HttpStatusCode.BadRequest, cause.message ?: "Bad Request"))
+				}
+				else -> {
+					cause.printStackTrace()
+					call.respondError(Error(HttpStatusCode.InternalServerError, cause.message ?: "Internal Server Error"))
+				}
+			}
 		}
 	}
 }
