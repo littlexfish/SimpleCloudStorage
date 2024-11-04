@@ -22,5 +22,23 @@ fun Route.apiDirectoryView() {
 				call.respondError(pathNotDirectoryError)
 			}
 		}
+		post("/create") {
+			val path = call.request.queryParameters["path"] ?: ""
+			val name = path.substringAfterLast('/', path)
+			val parent = path.substringBeforeLast('/', ".")
+			val file = FileService.createFile(parent, name)
+			if (!file.exists()) {
+				val suc = file.mkdirs()
+				if (!suc) {
+					call.respondError(Error(HttpStatusCode.BadRequest, "Failed to create directory"))
+				}
+				else {
+					call.respond(mapOf("path" to FileService.getPath(file)))
+				}
+			}
+			else {
+				call.respondError(Error(HttpStatusCode.BadRequest, "Failed to create file"))
+			}
+		}
 	}
 }

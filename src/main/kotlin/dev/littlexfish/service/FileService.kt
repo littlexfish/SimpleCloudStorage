@@ -1,6 +1,7 @@
 package dev.littlexfish.service
 
 import dev.littlexfish.dto.DirectoryStruct
+import dev.littlexfish.dto.FileExistsState
 import dev.littlexfish.dto.FilePreview
 import dev.littlexfish.dto.Node
 import java.io.File
@@ -86,7 +87,7 @@ object FileService {
 	}
 
 	fun getFilePreview(file: File): FilePreview {
-		val buffer = CharBuffer.allocate(ConfigService.config.maxTextFilePreviewLength)
+		val buffer = CharBuffer.allocate(ConfigService.config.maxPreviewFileSize)
 		file.bufferedReader().use {
 			it.read(buffer)
 		}
@@ -132,6 +133,19 @@ object FileService {
 
 	fun getSCSFile(name: String): File {
 		return File(scsHome, name)
+	}
+
+	fun getExistsStatus(path: String, fileNames: List<String>): List<FileExistsState> {
+		val parent = getFile(path)
+		return fileNames.map {
+			val file = File(parent, it)
+			val isDirectory = if (file.exists()) file.isDirectory else null
+			FileExistsState(it, isDirectory)
+		}
+	}
+
+	fun createFile(path: String, name: String): File {
+		return File(getFile(path), name)
 	}
 
 	class FileStateErrorException(state: FileStateError, file: File) : RuntimeException("${state.message}: ${fileToRelative(file)}") {

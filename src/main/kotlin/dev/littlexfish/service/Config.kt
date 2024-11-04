@@ -55,9 +55,9 @@ class Config {
 	)
 
 	/**
-	 * Max text file preview length, default 1MB
+	 * Max file preview length, default 1MB
 	 */
-	var maxTextFilePreviewLength = 1024 * 1024
+	var maxPreviewFileSize = 1024 * 1024
 
 }
 
