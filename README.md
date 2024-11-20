@@ -22,7 +22,7 @@ SimpleCloudStorage is a simple cloud storage service that allows users to upload
 - `SCS_PORT`: The server port. (default is `8080`)
 - `SCS_HOME`: The directory where the config file is stored. (default is `SimpleCloudStorage` directory)
 - `SCS_ROOT`: The directory where the files are stored. (default is the directory where the jar file is located)
-- `SCS_WEB_STATIC`: The directory where the web interface files are stored. (default is `SCS_HOME/static`)
+- `SCS_WEB_STATIC`: The directory where the web interface files are stored. (default is `$SCS_HOME$/static`)
 
 ## Configuration
 
