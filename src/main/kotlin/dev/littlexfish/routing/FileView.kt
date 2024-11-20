@@ -32,7 +32,7 @@ fun Route.apiFileView() {
 			if (file.isFile) {
 				call.respond(mapOf(
 					"type" to FileService.getExtensionType(file.extension),
-					"viewable" to (ConfigService.config.allowedViewExtensions.contains(file.extension) &&
+					"viewable" to (ConfigService.config.allowedPreviewExtensions.contains(file.extension) &&
 							file.length() <= ConfigService.config.maxPreviewFileSize)
 				))
 			}

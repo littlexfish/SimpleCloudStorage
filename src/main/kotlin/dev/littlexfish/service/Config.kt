@@ -47,7 +47,7 @@ class Config {
 	/**
 	 * Allowed view extensions
 	 */
-	var allowedViewExtensions: Set<String> = setOf(
+	var allowedPreviewExtensions: Set<String> = setOf(
 		"jpg", "jpeg", "png", "gif", "bmp", "webp",
 		"txt", "log",
 		"pdf",
