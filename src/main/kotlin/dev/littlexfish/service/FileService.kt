@@ -13,8 +13,8 @@ object FileService {
 
 	private val pathSepRegex = Regex("[/\\\\]+")
 
-	private val scsHome = System.getProperty("SCS_HOME")?.let { File(it) } ?: File(System.getenv("user.dir"), ProgramService.NAME)
-	private val rootFile = File(System.getProperty("SCS_ROOT") ?: System.getenv("SCS_ROOT") ?: ".").apply {
+	private val scsHome = System.getenv("SCS_HOME")?.let { File(it) } ?: File(System.getProperty("user.dir"), ProgramService.NAME)
+	private val rootFile = File(System.getenv("SCS_ROOT") ?: System.getenv("SCS_ROOT") ?: ".").apply {
 		if(isFile) {
 			throw IllegalArgumentException("Root path must be a directory")
 		}

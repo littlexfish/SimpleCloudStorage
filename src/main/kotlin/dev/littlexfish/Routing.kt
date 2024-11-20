@@ -11,7 +11,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.routing.*
 import java.io.File
 
-private val webStatic = (System.getProperty("SCS_WEB_STATIC")?.let { File(it) } ?: FileService.getSCSFile("static")).apply { mkdirs() }
+private val webStatic = (System.getenv("SCS_WEB_STATIC")?.let { File(it) } ?: FileService.getSCSFile("static")).apply { mkdirs() }
 
 fun Application.configureStatusPage() {
 	install(StatusPages) {

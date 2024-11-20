@@ -11,7 +11,9 @@ import io.ktor.server.plugins.cors.routing.*
 
 fun main() {
 	prepareResource()
-	embeddedServer(Netty, port = 9000, host = "0.0.0.0", module = Application::module)
+	val server: String = System.getenv("SCS_SERVER") ?: "0.0.0.0"
+	val port: Int = System.getenv("SCS_PORT")?.toIntOrNull() ?: 8080
+	embeddedServer(Netty, port = port, host = server, module = Application::module)
 		.start(wait = true)
 }
 
