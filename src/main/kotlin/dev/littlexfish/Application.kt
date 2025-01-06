@@ -37,7 +37,7 @@ fun Application.module() {
 			registerKotlinModule()
 		}
 	}
-//	configureSession()
+	configureSession()
 	configureStatusPage()
 	configureStaticPage()
 	configureRouting()

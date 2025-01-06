@@ -5,6 +5,7 @@ val kotlinx_html_version: String by project
 plugins {
 	kotlin("jvm") version "2.0.21"
 	id("io.ktor.plugin") version "3.0.0"
+	id("org.jetbrains.kotlin.plugin.serialization") version "1.6.10"
 }
 
 group = "dev.littlexfish"
