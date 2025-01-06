@@ -17,7 +17,7 @@ fun main() {
 		.start(wait = true)
 }
 
-val DEV_MODE = System.getProperty("io.ktor.development", "true") == "true"
+val DEV_MODE = System.getProperty("io.ktor.development", "false") == "true"
 
 fun prepareResource() {
 }
