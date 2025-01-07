@@ -11,8 +11,10 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
+import java.util.zip.ZipException
 
 private val pathNotFileError = Error(HttpStatusCode.BadRequest, "Path is not a file")
+private val cannotOpenAsZipError = Error(HttpStatusCode.BadRequest, "Cannot open as zip")
 
 fun Route.apiFileView() {
 	route("/file") {
@@ -54,7 +56,12 @@ fun Route.apiFileView() {
 			val path = call.request.queryParameters["path"] ?: "."
 			val file = FileService.getFile(path)
 			if (file.isFile) {
-				call.respond(FileService.getFileAsZip(file))
+				try {
+					call.respond(FileService.getFileAsZip(file))
+				}
+				catch (e: ZipException) {
+					call.respondError(cannotOpenAsZipError)
+				}
 			}
 			else {
 				call.respondError(pathNotFileError)
